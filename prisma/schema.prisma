@@ -3,14 +3,13 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id       String      @id @default(auto()) @map("_id") @db.ObjectId
-  slug     String      @unique
-  email    String?     @unique
+  slug     String      @id
+  email    String      @unique
   password String
   name     String
   avatar   String      @default("default.jpg")
@@ -22,32 +21,32 @@ model User {
 }
 
 model Tweet {
-  id        String      @id @default(auto()) @map("_id") @db.ObjectId
+  id        Int         @id @default(autoincrement())
   userSlug  String
   body      String
   image     String?
   createdAt DateTime    @default(now())
-  answerOf  String      @default("0")
+  answerOf  Int         @default(0)
   user      User        @relation(fields: [userSlug], references: [slug])
   likes     TweetLike[]
 }
 
 model TweetLike {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  id       Int    @id @default(autoincrement())
   userSlug String
-  tweetId  String
+  tweetId  Int
   user     User   @relation(fields: [userSlug], references: [slug])
   tweet    Tweet  @relation(fields: [tweetId], references: [id])
 }
 
 model Follow {
-  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  id        Int    @id @default(autoincrement())
   user1Skug String
   user2Slug String
 }
 
 model Trend {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        Int      @id @default(autoincrement())
   hashtag   String
   counter   Int      @default(1)
   updatedAt DateTime @default(now())
