@@ -2,6 +2,7 @@ import { Response } from "express";
 import { ExtendedRequest } from "../types/extended-request";
 import { addTweetSchema } from "../schemas/add-tweet";
 import { createTweet, findTweet } from "../services/tweet";
+import { addHashtag } from "../services/trend";
 
 export const addTweet = async (req: ExtendedRequest, res: Response) => {
     // validar os dados enviados
@@ -24,7 +25,16 @@ export const addTweet = async (req: ExtendedRequest, res: Response) => {
         safeData.data.body,
         safeData.data.answer ? parseInt(safeData.data.answer) : 0
     )
+
     // adicionar a Hashtag ao trend
+    const hashtags = safeData.data.body.match(/#[a-zA-Z0-9_]+/g);
+    if (hashtags) {
+        for (let hashtag of hashtags) {
+            if (hashtag.length >= 2) {
+                await addHashtag(hashtag);
+            }
+        }
+    }
 
     res.json({ tweet: newTweet })
 }
